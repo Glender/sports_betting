@@ -7,7 +7,7 @@
 # -150 means you get 100 for each 150 you bet. Favorite.
 
 # convert usa odds to eu odds
-to_decimal_odds <- function(american_odds) {
+american_to_decimal_odds <- function(american_odds) {
   
   # When odss are positive.
   if(american_odds > 0) {
@@ -19,9 +19,8 @@ to_decimal_odds <- function(american_odds) {
   }
 }
 
-
 # example converting -300 to decimals odds
-to_decimal_odds(-300)
+american_to_decimal_odds(-300)
 
 # Calculate Break Even percentage for USA odds.
 break_even_american_odds <- function(x) {
@@ -45,7 +44,7 @@ break_even_decimal_odds <- function(decimal_odds){
 }
 
 # example 
-break_even_decimal_odds(1.33)
+break_even_decimal_odds(2.3)
 
 # Convert American odds to probabilities.
 american_odds_to_prob <- function(american_odds){
@@ -73,8 +72,44 @@ hold_usa_percent <- function(...){
 hold_usa_percent(-125, 115)
 
 
+
+
+# Convert decimal odds to a probability.
+decimal_odds_to_prop <- function(decimal_odds) {
+  return(decimal_odds / (1 + decimal_odds))
+}
+
+# example
+decimal_odds_to_prop(1/9)
+
+# Calculate the Hold percentage based on the decimall odds.
+hold_percent_decimal_odds <- function(...) {
+  
+  probs <- sapply(c(...), decimal_odds_to_prop)
+  total_hold <- sum(probs)
+  
+  return(total_hold - 1)
+}
+
+# Calculate Hold Percentage for decimal odds.
+hold_percent_decimal_odds(1.2, 3.4)
+
+
+# Calculate bookmakers probabilities for decimal odds.
+bookmaker_prob_eu <- function(...){
+  
+  probs <- sapply(c(...), decimal_odds_to_prop)
+  total_hold <- sum(probs)
+  
+  result <- sapply(probs, function(prob) prob / total_hold)
+  return(result)
+}
+
+# example
+bookmaker_prob_eu(1.2, 2.3)
+
 # Calculate bookmakers probabilities for each betting options.
-bookmaker_usa_probs <- function(...){
+bookmaker_probs_usa <- function(...){
   
   probs <- sapply(c(...), american_odds_to_prob)
   total_hold <- sum(probs)
@@ -85,6 +120,7 @@ bookmaker_usa_probs <- function(...){
 
 # Example for -400 / +300.
 # Can be generalized to > 2 beting options.
-bookmaker_usa_probs(-400, 300)
+bookmaker_probs_usa(-400, 300)
+
 
 
