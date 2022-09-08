@@ -3,9 +3,6 @@
 # inspired by:
 # https://www.howtobet.com/calculator/hold-calculator/
 
-# +130 means you get 130 for each 100 you bet. Underdog.
-# -150 means you get 100 for each 150 you bet. Favorite.
-
 # convert usa odds to eu odds
 american_to_decimal_odds <- function(american_odds) {
   
@@ -38,6 +35,7 @@ break_even_american_odds <- function(x) {
 # example +130
 break_even_american_odds(130)
 
+
 # Calculate Break Even Percentage for decimal odds.
 break_even_decimal_odds <- function(decimal_odds){
   return(1 / decimal_odds)
@@ -60,7 +58,7 @@ american_odds_to_prob <- function(american_odds){
 }
 
 # Calculate the hold percentage.
-hold_usa_percent <- function(...){
+hold_percent_usa <- function(...){
   
   probs <- sapply(c(...), american_odds_to_prob)
   total_hold <- sum(probs)
@@ -69,20 +67,18 @@ hold_usa_percent <- function(...){
 }
 
 # example
-hold_usa_percent(-125, 115)
-
-
-
+hold_percent_usa(150, -175)
+hold_percent_usa(142, -140)
 
 # Convert decimal odds to a probability.
 decimal_odds_to_prop <- function(decimal_odds) {
-  return(decimal_odds / (1 + decimal_odds))
+  return(1 / decimal_odds)
 }
 
-# example
-decimal_odds_to_prop(1/9)
+# Example, 2 yields 0.5; 1.5 yields .667   
+decimal_odds_to_prop(1.5)
 
-# Calculate the Hold percentage based on the decimall odds.
+# Calculate the Hold percentage based on the decimal odds.
 hold_percent_decimal_odds <- function(...) {
   
   probs <- sapply(c(...), decimal_odds_to_prop)
@@ -92,7 +88,7 @@ hold_percent_decimal_odds <- function(...) {
 }
 
 # Calculate Hold Percentage for decimal odds.
-hold_percent_decimal_odds(1.2, 3.4)
+hold_percent_decimal_odds(1.71, 2.55, 1.86)
 
 
 # Calculate bookmakers probabilities for decimal odds.
@@ -106,7 +102,8 @@ bookmaker_prob_eu <- function(...){
 }
 
 # example
-bookmaker_prob_eu(1.2, 2.3)
+bookmaker_prob_eu(1.08, 13, 35)
+
 
 # Calculate bookmakers probabilities for each betting options.
 bookmaker_probs_usa <- function(...){
@@ -122,5 +119,24 @@ bookmaker_probs_usa <- function(...){
 # Can be generalized to > 2 beting options.
 bookmaker_probs_usa(-400, 300)
 
+# +130 means you get 130 for each 100 you bet. Underdog.
+# -150 means you get 100 for each 150 you bet. Favorite.
+profit_calc_usa <- function(usa_odds, amnt){
+  
+  # When positive odds (e.g. +130).
+  if(usa_odds > 0){
+    
+    profit <- (usa_odds / 100) * amnt
+    return(list(profit, profit / (profit + amnt)))
+    
+  # When negative odds (e.g. -130).
+  } else if(usa_odds < 0){
+    
+    profit <- (amnt / -usa_odds) * 100
+    return(list(profit, profit / (profit + amnt)))
+  }
+}
 
-
+# Some examples.
+profit_calc_usa(200, 100) # +300 / -100
+profit_calc_usa(-175, 100) # +157.14 / -100
